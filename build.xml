@@ -1,0 +1,39 @@
+<project name="alecqs" default="jar">
+	<target name="init">
+		<property name="projectname" value="alecqs"/>
+		<property file="version.properties"/>
+		<property name="builddir" value="out/production/main"/>
+		<mkdir dir="${builddir}" />
+	</target>
+
+	<target depends="compile" name="buildjar">
+	  <jar jarfile="alecqs.jar">
+	     <fileset dir="build/classes" />
+	     <manifest>
+	       <attribute name="Main-Class" value="com.mycompany.TestMain"/>
+	     </manifest>
+	 </jar>
+	</target>
+	
+	<target name="compile" description="Compiles Java files" depends="init">
+		<javac srcdir="src/main/java" destdir="${builddir}" debug="on" optimize="on" source="1.6" target="1.6"  includeantruntime="false">
+		    <compilerarg value="-Xlint"/>
+		</javac>
+	</target>
+
+	<target name="jar" description="creates a jar file" depends="compile">
+		<jar jarfile="${projectname}-${project.version}.jar"  basedir="${builddir}" includes="**" excludes="test/**">
+			<manifest>
+				<attribute name="Implementation-Vendor" value="org.kisst"/>
+				<attribute name="Implementation-Title" value="${projectname}"/>
+				<attribute name="Implementation-Version" value="${project.version}"/> 
+				<attribute name="Main-Class" value="Alecqs"/>
+			</manifest>
+	    </jar>
+	</target>
+
+	<target name="clean" depends="init">
+  		<delete dir="${builddir}" />
+  	</target>
+  	
+</project>

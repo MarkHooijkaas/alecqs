@@ -1,0 +1,30 @@
+ 
+@MACRO STD_SCRIPT
+@OUTPUTFILE ${FILEBASE}-${QMGR}-${ENV}.mqsc
+@GLOBAL QMGR=${QMGR_EXTERN}
+@GLOBAL SYSTEM=${SYSTEM}
+@GLOBAL AUTHOR=${AUTHOR}
+@GLOBAL RFC=${RFC}
+********************************
+* System: ${SYSTEM}
+* Author: ${AUTHOR}
+* RFC: ${RFC}
+@ENDMACRO
+ 
+@MACRO QL
+def ql(${QNAME}.LQ) replace defpsist(YES)
+@ENDMACRO
+ 
+@MACRO QA
+def qa(${QNAME}.AQ) replace  targq(${QNAME}.LQ) defpsist(YES)
+@ENDMACRO
+ 
+@MACRO QLA
+@VAR QNAME=${ENV}.{SYSTEM}.${NAME}
+ 
+**********************************************
+* Local and Alias Queue for ${NAME}
+**********************************************
+@RUN QL()
+@RUN QA()
+@ENDMACRO
