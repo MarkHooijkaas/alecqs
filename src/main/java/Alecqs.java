@@ -19,8 +19,6 @@ public class Alecqs {
       for (String arg: args) {
          if (arg.indexOf('=')>0)
             parser.parseProp(arg);
-         else if (arg.endsWith(".props"))
-            parser.parseFile(dir, arg,false);
          else if (arg.equals("-v"))
             parser.loglevel=INFO;
          else if (arg.equals("-d"))
@@ -28,7 +26,7 @@ public class Alecqs {
          else if (arg.equals("-q"))
             parser.loglevel=NONE;
          else
-            parser.parseFile(dir, arg,true);
+            parser.parseFile(dir, arg);
       }
       parser.closeOutput();
    }
@@ -48,7 +46,7 @@ public class Alecqs {
    public void pushVarMap(Map<String,String> map, String name) { map.put(PROPSNAME,name); vars.addFirst(map); }
    public Map<String,String> pushVarMap(String name) { Map<String,String> map=new HashMap<String,String>(); pushVarMap(map,name); return map; }
 
-   public void parseFile(File dir, String filename, boolean output) throws IOException {
+   public void parseFile(File dir, String filename) throws IOException {
       filename=filename.trim().replace('\\','/');
       log(INFO, "Parsing "+dir.toString().replace('\\','/')+"/"+filename);
       pushVarMap("File:"+filename);
@@ -58,8 +56,6 @@ public class Alecqs {
       String filebase=filename.substring(0,pos0);
       addProp("FILENAME", filename);
       addProp("FILEBASE", filebase);
-      if (output && out==null)
-         changeOutputFile(file.getParentFile(), filebase+".out");
 
       BufferedReader inp = null;
       int linenr=0;
@@ -69,31 +65,7 @@ public class Alecqs {
          String line;
          while ((line = inp.readLine()) != null) {
             linenr++;
-            if (line.startsWith("@MACRO")) {
-               String name=line.substring(6).trim();
-               StringBuilder macro=new StringBuilder();
-               while ((line = inp.readLine()) != null) {
-                  linenr++;
-                  if (line.trim().startsWith("@ENDMACRO"))
-                     break;
-                  else
-                     macro.append(line+"\n");
-               }
-               addProp(name,macro.toString());
-               continue;
-            }
-            if (line.indexOf('=')>0 && ! output) {
-               line=substitute(line);
-               parseProp(line.trim());
-            }
-            else
-               line = parseLine(file.getParentFile(), line);
-            if (line==null)
-               continue;
-            else if (line.startsWith("@LOAD"))
-               loadDefinitions(file.getParentFile(), line.substring(5));
-            else if (output)
-               out.println(line);
+            linenr+=parseLine(inp, file.getParentFile(), line);
          }
          done=true;
       }
@@ -105,16 +77,33 @@ public class Alecqs {
       }
    }
 
-   public void loadDefinitions(File dir, String filename) throws IOException { parseFile(dir, filename, false);}
-   public void includeFile(File dir, String filename) throws IOException { parseFile(dir, filename, true); popVarMap();}
+   public void loadDefinitions(File dir, String filename) throws IOException { parseFile(dir, filename);}
+   //public void includeFile(File dir, String filename) throws IOException { parseFile(dir, filename, true); popVarMap();}
 
-   private String parseLine(File dir, String line) throws IOException {
-        if (line.startsWith("@VAR"))
+   private int  parseLine(BufferedReader inp, File dir, String line) throws IOException {
+      //log(DEBUG, "Reading: "+line);
+      if (line.startsWith("@VAR"))
          parseProp(substitute(line.substring(4)));
       else if (line.startsWith("@GLOBAL"))
          parseProp(globalVars, substitute(line.substring(7)));
-      else if (line.startsWith("@INCLUDE"))
-         includeFile(dir, line.substring(8));
+      //else if (line.startsWith("@INCLUDE"))
+      //   includeFile(dir, line.substring(8));
+      else if (line.startsWith("@MACRO")) {
+         //if (inp==null)
+         //   throw new RuntimeException("Can not use @MACRO on command line");
+         String name=line.substring(6).trim();
+         StringBuilder macro=new StringBuilder();
+         int linenr=0;
+         while ((line = inp.readLine()) != null) {
+            linenr++;
+            if (line.trim().startsWith("@ENDMACRO"))
+               break;
+            else
+               macro.append(line+"\n");
+         }
+         addProp(name,macro.toString());
+         return linenr;
+      }
       else if (line.startsWith("@RUN")) {
             line=line.substring(4);
             int pos1=line.indexOf('(');
@@ -124,27 +113,28 @@ public class Alecqs {
             String cmd=line.substring(0,pos1).trim();
             log(DEBUG, "Running macro: "+cmd);
             String[] args=line.substring(pos1+1,pos2).split("[,]+");
-         Map<String,String> macrovars = pushVarMap("macrovars");
+            Map<String,String> macrovars = pushVarMap("macrovars");
             for (String arg: args) {
-            arg=arg.trim();
-            if (arg.length()>0)
-            parseProp(substitute(arg));
-         }
+               arg=arg.trim();
+               if (arg.length()>0)
+               parseProp(substitute(arg));
+            }
             line=getPropertyValue(cmd);
-         for (String l: line.split("\\r\\n|\\n|\\r")) {
-            //System.out.println(l);
-            String result = parseLine(dir, l);
-            if (result!=null)
-               out.println(result);
-         }
+            for (String l: line.split("\\r\\n|\\n|\\r"))
+               parseLine(inp, dir, l);
          popVarMap();
-         return null;
-        }
+      }
       else if (line.startsWith("@OUTPUTFILE"))
          changeOutputFile(dir, substitute(line.substring(11).trim()));
-      else
-          return substitute(line);
-      return null;
+      else if (line.startsWith("@LOAD"))
+         loadDefinitions(dir, line.substring(5));
+      else if (line.indexOf('=')>0 && out==null) {
+         line=substitute(line);
+         parseProp(line.trim());
+      }
+      else if (out!=null)
+         out.println(substitute(line));
+      return 0;
    }
 
    private void log(int level, String s) {
@@ -153,11 +143,14 @@ public class Alecqs {
    }
 
    private void changeOutputFile(File dir, String filename) throws FileNotFoundException {
+      log(INFO, "Setting output to "+filename);
+
       int pos=filename.lastIndexOf('/');
       if (pos>0)
          filename=filename.substring(pos+1);
       int pos0=filename.lastIndexOf('.');
-      filename.substring(0,pos0);
+      if (pos>0)
+         filename.substring(0,pos0);
 
       if (!filename.equals(currentFilename)) {
             if (out!=null)

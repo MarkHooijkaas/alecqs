@@ -2,7 +2,7 @@
 *
 * Created on request of John Doe
 *
- 
+
 @RUN QLA(NAME=PROCES1.INPUT)
 @RUN QLA(NAME=PROCES1.ERROR)
 @RUN QLA(NAME=SOMETHING)
