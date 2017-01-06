@@ -16,11 +16,11 @@ def ql(${QNAME}.LQ) replace defpsist(YES)
 @ENDMACRO
  
 @MACRO QA
-def qa(${QNAME}.AQ) replace  targq(${QNAME}.LQ) defpsist(YES)
+def qa(${QNAME}.AQ) replace targq(${QNAME}.LQ) defpsist(YES)
 @ENDMACRO
  
 @MACRO QLA
-@VAR QNAME=${ENV}.{SYSTEM}.${NAME}
+@VAR QNAME=${ENV}.${SYSTEM}.${NAME}
  
 **********************************************
 * Local and Alias Queue for ${NAME}
