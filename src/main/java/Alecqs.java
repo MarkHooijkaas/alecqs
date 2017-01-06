@@ -49,7 +49,7 @@ public class Alecqs {
    public Map<String,String> pushVarMap(String name) { Map<String,String> map=new HashMap<String,String>(); pushVarMap(map,name); return map; }
 
    public void parseFile(File dir, String filename, boolean output) throws IOException {
-      filename=filename.trim();
+      filename=filename.trim().replace('\\','/');
       log(INFO, "Parsing "+dir.toString().replace('\\','/')+"/"+filename);
       pushVarMap("File:"+filename);
 
