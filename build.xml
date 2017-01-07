@@ -27,7 +27,7 @@
 				<attribute name="Implementation-Vendor" value="org.kisst"/>
 				<attribute name="Implementation-Title" value="${projectname}"/>
 				<attribute name="Implementation-Version" value="${project.version}"/> 
-				<attribute name="Main-Class" value="org.kisst.alecqs.Alecqs"/>
+				<attribute name="Main-Class" value="org.kisst.alecqs.Main"/>
 			</manifest>
 	    </jar>
 	</target>
