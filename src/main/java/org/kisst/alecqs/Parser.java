@@ -20,7 +20,7 @@ public class Parser {
 	private final File dir;
 	private final String indent;
 
-	private String currentFilename=null;
+	private File currentOutputFile = null;
 	private PrintStream out = null;
 	public int currentLogLevel = WARN;
 
@@ -35,7 +35,7 @@ public class Parser {
 			indent="";
 		}
 		else {
-			this.currentLogLevel =parent.currentLogLevel;
+			this.currentLogLevel = parent.currentLogLevel;
 			this.indent=parent.indent+"\t";
 		}
 		if (src instanceof FileSource) {
@@ -130,8 +130,10 @@ public class Parser {
 			}
 			p.parse();
 		}
-		else if (line.startsWith("@OUTPUTFILE"))
-			changeOutputFile(substitute(line.substring(11).trim()));
+		else if (line.startsWith("@OUTPUTFILE")) {
+			File f = new File(dir, substitute(line.substring(11).trim()));
+			changeOutputFile(f);
+		}
 		else if (line.startsWith("@LOAD")) {
 			FileSource f = new FileSource(new File(dir, line.substring(5).trim()));
 			Parser p= new Parser(this,f);
@@ -154,25 +156,30 @@ public class Parser {
 			log(WARN, "Ignoring:"+line);
 	}
 
-	private void changeOutputFile(String filename)  {
+	public void changeOutputFile(File f)  {
+		/*
 		//log(INFO, "Setting output to "+filename);
-
+		filename=filename.replace('\\','/')
 		int pos=filename.lastIndexOf('/');
 		if (pos>0)
 			filename=filename.substring(pos+1);
 		int pos0=filename.lastIndexOf('.');
 		if (pos>0)
 			filename.substring(0,pos0);
-
-		if (!filename.equals(currentFilename)) {
+*/
+		try {
+			f=f.getCanonicalFile();
+		}
+		catch (IOException e) { throw new RuntimeException(e); }
+		if (! f.equals(currentOutputFile)) {
 			if (out!=null)
 				out.close();
 			try {
-				out=new PrintStream(new FileOutputStream(new File(dir, filename)));
+				out=new PrintStream(new FileOutputStream(f));
 			}
 			catch (FileNotFoundException e) { throw new RuntimeException(e); }
-			currentFilename=filename;
-			log(INFO, "Setting output to "+dir.toString().replace('\\','/')+"/"+currentFilename);
+			currentOutputFile=f;
+			log(INFO, "Setting output to "+f.getName());
 		}
 	}
 	public void closeOutput() {
@@ -196,7 +203,7 @@ public class Parser {
 				value="$";
 			if (value==null)
 				throw new RuntimeException("Unknown variable ${"+key+"}");
-			result.append(value.toString());
+			result.append(value);
 			prevpos=pos2+1;
 			pos=str.indexOf("${",prevpos);
 		}
