@@ -30,8 +30,8 @@ public class Parser {
 		this.dir=dir;
 		this.src=src;
 		if (parent==null) {
-			setGlobalProp("$", "$");
-			setGlobalProp("@", "@");
+			setLocalProp("$", "$");
+			setLocalProp("@", "@");
 			indent="";
 		}
 		else {
@@ -50,14 +50,6 @@ public class Parser {
 			log(DEBUG, "setting local property "+key+"="+value);
 		vars.put(key.trim(), value);
 	}
-	public void setGlobalProp(String key, String value) {
-		//if (activeLogLevel(DEBUG))
-		//	log(DEBUG, "setting global property "+key+"="+value);
-		if (parent==null)
-			setLocalProp(key,value); // TODO: logs this as local property on the root Parser
-		else
-			parent.setGlobalProp(key, value);
-	}
 	public String getProp(String key) {
 		String result =  vars.get(key);
 		if (result != null)
@@ -65,6 +57,11 @@ public class Parser {
 		if (parent!=null)
 			return parent.getProp(key);
 		return null;
+	}
+	public Parser getRoot() {
+		if (parent==null)
+			return this;
+		return parent.getRoot();
 	}
 
 
@@ -89,11 +86,11 @@ public class Parser {
 		if (line.startsWith("@VAR"))
 			parseLocalProp(substitute(line.substring(4)));
 		else if (line.startsWith("@GLOBAL"))
-			parseGlobalProp(substitute(line.substring(7)));
+			getRoot().parseLine(substitute(line.substring(7)));
 		else if (line.startsWith("@PARENT")) {
 			if (parent==null)
 				throw new RuntimeException("no parent in this parser context");
-			parent.parseLine(line.substring(7).trim());
+			parent.parseLine(substitute(line.substring(7).trim()));
 		}
 		else if (line.startsWith("@LOGLEVEL"))
 			currentLogLevel =Integer.parseInt(line.substring(9).trim());
@@ -107,7 +104,7 @@ public class Parser {
 				else
 					macro.append(line).append("\n");
 			}
-			setGlobalProp(name, macro.toString());
+			getRoot().setLocalProp(name, macro.toString());
 		}
 		else if (line.startsWith("@RUN")) {
 			line=line.substring(4).trim();
@@ -223,7 +220,7 @@ public class Parser {
 	public void parseGlobalProp(String arg) {
 		int pos= arg.indexOf("=");
 		if (pos>0)
-			setGlobalProp(arg.substring(0, pos).trim(), arg.substring(pos+1).trim());
+			getRoot().setLocalProp(arg.substring(0, pos).trim(), arg.substring(pos+1).trim());
 		else
 			log(WARN, "ignoring global property definition "+ arg);
 	}
