@@ -19,6 +19,7 @@ public class Parser {
 	private final Map<String,String> vars = new HashMap<String, String>();
 	private final File dir;
 	private final String indent;
+	private final Command[] commands;
 
 	private File currentOutputFile = null;
 	private PrintStream out = null;
@@ -26,6 +27,7 @@ public class Parser {
 
 	public Parser(Parser parent, FileSource src) { this(parent, src, src.getDir()); }
 	public Parser(Parser parent, LineSource src, File dir) {
+		this.commands=BasicCommands.all;
 		this.parent=parent;
 		this.dir=dir;
 		this.src=src;
@@ -44,6 +46,11 @@ public class Parser {
 			setLocalProp("FILEBASE", f.getFilebase());
 		}
 	}
+
+	public String readLine() { return src.getLine(); }
+	public Parser getParent() { return parent; }
+	public File getDir() { return dir; }
+
 
 	public void setLocalProp(String key, String value) {
 		if (activeLogLevel(DEBUG))
@@ -82,60 +89,12 @@ public class Parser {
 
 
 	public void parseLine(String line) {
+		for (Command cmd: commands) {
+			if (cmd.handle(this,line))
+				return;
+		}
 		log(DEBUG, "Parsing:"+line);
-		if (line.startsWith("@VAR"))
-			parseLocalProp(substitute(line.substring(4)));
-		else if (line.startsWith("@GLOBAL"))
-			getRoot().parseLine(substitute(line.substring(7)));
-		else if (line.startsWith("@PARENT")) {
-			if (parent==null)
-				throw new RuntimeException("no parent in this parser context");
-			parent.parseLine(substitute(line.substring(7).trim()));
-		}
-		else if (line.startsWith("@LOGLEVEL"))
-			currentLogLevel =Integer.parseInt(line.substring(9).trim());
-		else if (line.startsWith("@MACRO")) {
-			String name=line.substring(6).trim();
-			StringBuilder macro=new StringBuilder();
-			int linenr=0;
-			while ((line = src.getLine()) != null) {
-				if (line.trim().startsWith("@ENDMACRO"))
-					break;
-				else
-					macro.append(line).append("\n");
-			}
-			getRoot().setLocalProp(name, macro.toString());
-		}
-		else if (line.startsWith("@RUN")) {
-			line=line.substring(4).trim();
-			String cmd=getFirstToken(line);
-			line=line.substring(cmd.length());
-			log(INFO, "Running macro: "+cmd);
-			String macro=getProp(cmd);
-			if (macro==null)
-				throw new RuntimeException("could not find macro "+cmd);
-			StringSource lines= new StringSource("MACRO "+cmd, macro);
-			Parser p=new Parser(this, lines, dir);
-			String[] args=line.split("[,]+");
-			for (String arg: args) {
-				arg=arg.trim();
-				if (arg.length()>0)
-					p.parseLocalProp(substitute(arg));
-			}
-			p.parse();
-		}
-		else if (line.startsWith("@OUTPUTFILE")) {
-			File f = new File(dir, substitute(line.substring(11).trim()));
-			changeOutputFile(f);
-		}
-		else if (line.startsWith("@LOAD")) {
-			File f=new File(dir, line.substring(5).trim());
-			log(INFO, "Loading: "+f);
-			FileSource fs = new FileSource(f);
-			Parser p= new Parser(this,fs);
-			p.parse();
-		}
-		else if (line.indexOf('=')>0 && out==null) {
+		if (line.indexOf('=')>0 && out==null) {
 			line=substitute(line);
 			parseGlobalProp(line.trim());
 		}
@@ -143,16 +102,7 @@ public class Parser {
 			outputLine(this, line);
 	}
 
-	private static String getFirstToken(String line) {
-		line=line.trim();
-		int pos1=line.indexOf(' ');
-		int pos2=line.indexOf('\t');
-		if (pos2>0 && pos2<pos1)
-			pos1=pos2;
-		if (pos1>0)
-			return line.substring(0,pos1);
-		return line;
-	}
+
 	public void outputLine(Parser context, String line) {
 		if (out!=null)
 			out.println(context.substitute(line));
@@ -163,16 +113,6 @@ public class Parser {
 	}
 
 	public void changeOutputFile(File f)  {
-		/*
-		//log(INFO, "Setting output to "+filename);
-		filename=filename.replace('\\','/')
-		int pos=filename.lastIndexOf('/');
-		if (pos>0)
-			filename=filename.substring(pos+1);
-		int pos0=filename.lastIndexOf('.');
-		if (pos>0)
-			filename.substring(0,pos0);
-*/
 		try {
 			f=f.getCanonicalFile();
 		}
@@ -233,11 +173,9 @@ public class Parser {
 	}
 
 	private boolean activeLogLevel(int level) { return level<= currentLogLevel;}
-	private void log(int level, String s) {
+	public void log(int level, String s) {
 		if (activeLogLevel(level))
 			System.out.println(indent+src.getLocation()+":"+s);
 	}
-
-
 }
  
