@@ -13,4 +13,9 @@ alecqs*.jar
 logs
 tmp
 .idea
-src/main/main.iml
+.ant-targets-build.xml
+.DS_Store
+*.iml
+
+# Generated testfile
+*.mqsc
