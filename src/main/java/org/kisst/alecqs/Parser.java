@@ -110,19 +110,16 @@ public class Parser {
 			setGlobalProp(name, macro.toString());
 		}
 		else if (line.startsWith("@RUN")) {
-			line=line.substring(4);
-			int pos1=line.indexOf('(');
-			int pos2=line.indexOf(')');
-			if (pos1<=0 || pos2<=0)
-				throw new  RuntimeException("@RUN line should contain ( and )");
-			String cmd=line.substring(0,pos1).trim();
-			log(DEBUG, "Running macro: "+cmd);
+			line=line.substring(4).trim();
+			String cmd=getFirstToken(line);
+			line=line.substring(cmd.length());
+			log(INFO, "Running macro: "+cmd);
 			String macro=getProp(cmd);
 			if (macro==null)
 				throw new RuntimeException("could not find macro "+cmd);
 			StringSource lines= new StringSource("MACRO "+cmd, macro);
 			Parser p=new Parser(this, lines, dir);
-			String[] args=line.substring(pos1+1,pos2).split("[,]+");
+			String[] args=line.split("[,]+");
 			for (String arg: args) {
 				arg=arg.trim();
 				if (arg.length()>0)
@@ -135,8 +132,10 @@ public class Parser {
 			changeOutputFile(f);
 		}
 		else if (line.startsWith("@LOAD")) {
-			FileSource f = new FileSource(new File(dir, line.substring(5).trim()));
-			Parser p= new Parser(this,f);
+			File f=new File(dir, line.substring(5).trim());
+			log(INFO, "Loading: "+f);
+			FileSource fs = new FileSource(f);
+			Parser p= new Parser(this,fs);
 			p.parse();
 		}
 		else if (line.indexOf('=')>0 && out==null) {
@@ -147,13 +146,23 @@ public class Parser {
 			outputLine(this, line);
 	}
 
+	private static String getFirstToken(String line) {
+		line=line.trim();
+		int pos1=line.indexOf(' ');
+		int pos2=line.indexOf('\t');
+		if (pos2>0 && pos2<pos1)
+			pos1=pos2;
+		if (pos1>0)
+			return line.substring(0,pos1);
+		return line;
+	}
 	public void outputLine(Parser context, String line) {
 		if (out!=null)
 			out.println(context.substitute(line));
 		else if (parent!=null)
 			parent.outputLine(context, line);
-		else
-			log(WARN, "Ignoring:"+line);
+		//else
+		//	log(WARN, "Ignoring:"+line);
 	}
 
 	public void changeOutputFile(File f)  {

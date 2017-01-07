@@ -25,6 +25,6 @@ def qa(${QNAME}.AQ) replace targq(${QNAME}.LQ) defpsist(YES)
 **********************************************
 * Local and Alias Queue for ${NAME}
 **********************************************
-@RUN QL()
-@RUN QA()
+@RUN QL
+@RUN QA
 @ENDMACRO
