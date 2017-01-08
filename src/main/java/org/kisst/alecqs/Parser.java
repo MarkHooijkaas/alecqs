@@ -1,5 +1,7 @@
 package org.kisst.alecqs;
 
+import org.kisst.alecqs.command.BasicCommands;
+import org.kisst.alecqs.command.Command;
 import org.kisst.alecqs.logger.Logger;
 import org.kisst.alecqs.logger.ParserLogger;
 
@@ -26,7 +28,7 @@ public class Parser {
 
 	public Parser(Parser parent, FileSource src) { this(parent, src, src.getDir()); }
 	public Parser(Parser parent, LineSource src, File dir) {
-		this.commands=BasicCommands.all;
+		this.commands= BasicCommands.all;
 		this.parent=parent;
 		this.dir=dir;
 		this.src=src;

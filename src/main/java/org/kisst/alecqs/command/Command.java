@@ -1,4 +1,6 @@
-package org.kisst.alecqs;
+package org.kisst.alecqs.command;
+
+import org.kisst.alecqs.Parser;
 
 public interface Command {
 	/**
