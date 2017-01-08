@@ -9,7 +9,7 @@ public abstract class NamedCommand implements Command {
 		if (! line.trim().startsWith(name))
 			return false;
 		String remainder=line.substring(name.length());
-		parser.log(Parser.DEBUG, this+": "+remainder);
+		parser.logger.logInfo("Command: "+name+remainder);
 		execute(parser, remainder);
 		return true;
 	}

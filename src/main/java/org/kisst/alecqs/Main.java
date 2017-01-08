@@ -1,5 +1,7 @@
 package org.kisst.alecqs;
 
+import org.kisst.alecqs.logger.Logger;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -10,11 +12,11 @@ public class Main {
 			if (args[i].indexOf('=')>0)
 				continue;
 			else if (args[i].equals("-v"))
-				args[i]="@LOGLEVEL "+Parser.INFO;
+				args[i]="@LOGLEVEL "+ Logger.Level.INFO;
 			else if (args[i].equals("-d"))
-				args[i]="@LOGLEVEL "+Parser.DEBUG;
+				args[i]="@LOGLEVEL "+Logger.Level.DEBUG;
 			else if (args[i].equals("-q"))
-				args[i]="@LOGLEVEL "+Parser.NONE;
+				args[i]="@LOGLEVEL "+Logger.Level.NONE;
 			else
 				args[i]="@LOAD "+args[i];
 		}

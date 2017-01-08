@@ -1,29 +1,28 @@
 package org.kisst.alecqs;
 
-import java.io.*;
-import java.util.*;
+import org.kisst.alecqs.logger.Logger;
+import org.kisst.alecqs.logger.ParserLogger;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class Parser {
+	public final Parser parent;
+	public final LineSource src;
+	public final Logger logger;
 
-	public static final int NONE  = 0;
-	public static final int FATAL = 10;
-	public static final int ERROR = 20;
-	public static final int WARN  = 30;
-	public static final int INFO  = 40;
-	public static final int DEBUG = 50;
-	public static final int TRACE = 60;
-
-	private final Parser parent;
-	private final LineSource src;
 	private final Map<String,String> vars = new HashMap<String, String>();
 	private final File dir;
-	private final String indent;
 	private final Command[] commands;
 
 	private File currentOutputFile = null;
 	private PrintStream out = null;
-	public int currentLogLevel = WARN;
 
 	public Parser(Parser parent, FileSource src) { this(parent, src, src.getDir()); }
 	public Parser(Parser parent, LineSource src, File dir) {
@@ -31,14 +30,10 @@ public class Parser {
 		this.parent=parent;
 		this.dir=dir;
 		this.src=src;
+		this.logger=new ParserLogger(this);
 		if (parent==null) {
 			setLocalProp("$", "$");
 			setLocalProp("@", "@");
-			indent="";
-		}
-		else {
-			this.currentLogLevel = parent.currentLogLevel;
-			this.indent=parent.indent+"\t";
 		}
 		if (src instanceof FileSource) {
 			FileSource f= (FileSource) src;
@@ -53,8 +48,8 @@ public class Parser {
 
 
 	public void setLocalProp(String key, String value) {
-		if (activeLogLevel(DEBUG))
-			log(DEBUG, "setting local property "+key+"="+value);
+		if (logger.debugEnabled())
+			logger.logDebug("setting local property "+key+"="+value);
 		vars.put(key.trim(), value);
 	}
 	public String getProp(String key) {
@@ -93,7 +88,7 @@ public class Parser {
 			if (cmd.handle(this,line))
 				return;
 		}
-		log(DEBUG, "Parsing:"+line);
+		logger.logTrace("Parsing:"+line);
 		if (line.indexOf('=')>0 && out==null) {
 			line=substitute(line);
 			parseGlobalProp(line.trim());
@@ -125,7 +120,7 @@ public class Parser {
 			}
 			catch (FileNotFoundException e) { throw new RuntimeException(e); }
 			currentOutputFile=f;
-			log(INFO, "Setting output to "+f.getName());
+			logger.logInfo("Setting output to "+f.getName());
 		}
 	}
 	public void closeOutput() {
@@ -162,20 +157,14 @@ public class Parser {
 		if (pos>0)
 			getRoot().setLocalProp(arg.substring(0, pos).trim(), arg.substring(pos+1).trim());
 		else
-			log(WARN, "ignoring global property definition "+ arg);
+			logger.logWarn("ignoring global property definition "+ arg);
 	}
 	public void parseLocalProp(String arg) {
 		int pos= arg.indexOf("=");
 		if (pos>0)
 			setLocalProp(arg.substring(0, pos).trim(), arg.substring(pos+1).trim());
 		else
-			log(WARN, "ignoring local property definition "+ arg);
-	}
-
-	private boolean activeLogLevel(int level) { return level<= currentLogLevel;}
-	public void log(int level, String s) {
-		if (activeLogLevel(level))
-			System.out.println(indent+src.getLocation()+":"+s);
+			logger.logWarn("ignoring local property definition "+ arg);
 	}
 }
  

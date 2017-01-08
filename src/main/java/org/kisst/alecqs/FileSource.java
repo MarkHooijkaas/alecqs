@@ -29,6 +29,9 @@ public class FileSource implements LineSource {
 		//setLocalProp("FILEBASE", filebase);
 	}
 
+	@Override public String getName() { return filename;}
+	@Override public int getLinenr() { return linenr; }
+	public File getDir() { return file.getParentFile();}
 	public String getFilename() { return filename;}
 	public String getFilebase() { return filebase;}
 
@@ -49,7 +52,6 @@ public class FileSource implements LineSource {
 		catch (IOException e) { throw new RuntimeException(e); }
 	}
 
-	public File getDir() { return file.getParentFile();}
 
 
 }

@@ -1,12 +1,14 @@
 package org.kisst.alecqs;
 
+import org.kisst.alecqs.logger.Logger;
+
 import java.io.File;
 
 public class BasicCommands {
 	public final static Command LOAD = new NamedCommand("LOAD") {
 		@Override protected void execute(Parser parser, String remainder) {
 			File f = new File(parser.getDir(), remainder.trim());
-			parser.log(Parser.INFO, "Loading: " + f);
+			parser.logger.logDebug("Loading: " + f);
 			FileSource fs = new FileSource(f);
 			Parser p = new Parser(parser, fs);
 			p.parse();
@@ -48,7 +50,6 @@ public class BasicCommands {
 			remainder=remainder.trim();
 			String cmd=getFirstToken(remainder);
 			remainder=remainder.substring(cmd.length());
-			parser.log(Parser.INFO, "Running macro: "+cmd);
 			String macro=parser.getProp(cmd);
 			if (macro==null)
 				throw new RuntimeException("could not find macro "+cmd);
@@ -73,7 +74,7 @@ public class BasicCommands {
 
 	public final static Command LOGLEVEL = new NamedCommand("LOGLEVEL") {
 		@Override protected void execute(Parser parser, String remainder) {
-			parser.currentLogLevel =Integer.parseInt(remainder.trim());
+			parser.logger.setLogLevel(Logger.Level.valueOf(remainder.trim()));
 		}
 	};
 

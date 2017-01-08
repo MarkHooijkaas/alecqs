@@ -16,4 +16,7 @@ public interface LineSource {
 	public String getLocation();
 
 	public void close(); // do not (yet) use AutoClosable to remain compatible with java 1.6
+
+	public String getName();
+	public int getLinenr();
 }

@@ -12,6 +12,9 @@ public class StringSource implements LineSource {
 		this.lines=lines;
 	}
 
+	@Override public String getName() { return name;}
+	@Override public int getLinenr() { return linenr; }
+
 	@Override public String getLine() {
 		if (linenr>=lines.length)
 			return null;
