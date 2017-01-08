@@ -89,7 +89,7 @@ public class BasicCommands {
 	};
 
 
-	public final static Command[] all = new Command[]{
+	public final static CommandList all = new CommandList(
 			LOAD,
 			GLOBAL,
 			RUN,
@@ -98,5 +98,5 @@ public class BasicCommands {
 			PARENT,
 			OUTPUTFILE,
 			LOGLEVEL
-	};
+	);
 }

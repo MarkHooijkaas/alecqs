@@ -1,7 +1,7 @@
 package org.kisst.alecqs;
 
 import org.kisst.alecqs.command.BasicCommands;
-import org.kisst.alecqs.command.Command;
+import org.kisst.alecqs.command.CommandList;
 import org.kisst.alecqs.logger.Logger;
 import org.kisst.alecqs.logger.ParserLogger;
 
@@ -21,7 +21,7 @@ public class Parser {
 
 	private final Map<String,String> vars = new HashMap<String, String>();
 	private final File dir;
-	private final Command[] commands;
+	private final CommandList commands;
 
 	private File currentOutputFile = null;
 	private PrintStream out = null;
@@ -86,11 +86,10 @@ public class Parser {
 
 
 	public void parseLine(String line) {
-		for (Command cmd: commands) {
-			if (cmd.handle(this,line))
-				return;
-		}
-		logger.logTrace("Parsing:"+line);
+		if (commands.handle(this,line))
+			return;
+		if (logger.traceEnabled())
+			logger.logTrace("Parsing:"+line);
 		if (line.indexOf('=')>0 && out==null) {
 			line=substitute(line);
 			parseGlobalProp(line.trim());
