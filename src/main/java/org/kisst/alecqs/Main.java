@@ -13,7 +13,7 @@ public class Main {
 
 		for (int i=0; i<args.length; i++) {
 			if (args[i].indexOf('=')>0)
-				continue;
+				args[i]="@GLOBAL "+args[i];
 			else if (args[i].equals("-v"))
 				args[i]="@LOGLEVEL "+ Logger.Level.INFO;
 			else if (args[i].equals("-d"))
@@ -28,7 +28,7 @@ public class Main {
 		//Parser parser=new Parser(null, argsrc, dir);
 		Parser parser= new Parser.Builder()
 				.src(argsrc)
-				.logger(new SimpleSourceLogger(null)) // TODO
+				.logger(new SimpleSourceLogger(argsrc,""))
 				.commands(BasicCommands.all)
 				.build();
 		parser.parse();

@@ -6,7 +6,7 @@ public class SimpleSourceLogger extends BaseLogger implements SourceLogger {
 	private final LineSource src;
 	private final String prefix;
 	private final String indent;
-	private Level currentLogLevel;
+	private Level currentLogLevel=Level.WARN;
 
 	public SimpleSourceLogger(LineSource src, String indent) {
 		this.src=src;
