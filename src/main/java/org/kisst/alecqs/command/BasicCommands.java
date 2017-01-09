@@ -1,8 +1,8 @@
 package org.kisst.alecqs.command;
 
-import org.kisst.alecqs.FileSource;
+import org.kisst.alecqs.linesource.FileSource;
 import org.kisst.alecqs.Parser;
-import org.kisst.alecqs.StringSource;
+import org.kisst.alecqs.linesource.StringSource;
 import org.kisst.alecqs.logger.Logger;
 
 import java.io.File;

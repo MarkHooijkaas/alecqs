@@ -1,6 +1,6 @@
 package org.kisst.alecqs.logger;
 
-import org.kisst.alecqs.LineSource;
+import org.kisst.alecqs.linesource.LineSource;
 
 public class SimpleSourceLogger extends BaseLogger implements SourceLogger {
 	private final LineSource src;

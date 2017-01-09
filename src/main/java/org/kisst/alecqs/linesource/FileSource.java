@@ -1,4 +1,4 @@
-package org.kisst.alecqs;
+package org.kisst.alecqs.linesource;
 
 import java.io.BufferedReader;
 import java.io.File;

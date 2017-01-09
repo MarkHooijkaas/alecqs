@@ -1,6 +1,7 @@
 package org.kisst.alecqs;
 
 import org.kisst.alecqs.command.BasicCommands;
+import org.kisst.alecqs.linesource.StringSource;
 import org.kisst.alecqs.logger.Logger;
 import org.kisst.alecqs.logger.SimpleSourceLogger;
 

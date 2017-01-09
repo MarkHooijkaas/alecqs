@@ -1,6 +1,7 @@
 package org.kisst.alecqs;
 
 import org.kisst.alecqs.command.Command;
+import org.kisst.alecqs.linesource.LineSource;
 import org.kisst.alecqs.logger.SourceLogger;
 
 import java.io.File;
