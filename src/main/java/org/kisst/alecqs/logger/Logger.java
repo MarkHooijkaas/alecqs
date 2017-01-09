@@ -31,5 +31,4 @@ public interface Logger {
 	public void logInfo(String s);
 	public void logDebug(String s);
 	public void logTrace(String s);
-
 }

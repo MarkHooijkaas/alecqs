@@ -1,6 +1,8 @@
 package org.kisst.alecqs;
 
+import org.kisst.alecqs.command.BasicCommands;
 import org.kisst.alecqs.logger.Logger;
+import org.kisst.alecqs.logger.SimpleSourceLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +24,12 @@ public class Main {
 		}
 		File dir=new File(".");
 		StringSource argsrc = new StringSource("main", args);
-		Parser parser=new Parser(null, argsrc, dir);
+		//Parser parser=new Parser(null, argsrc, dir);
+		Parser parser= new Parser.Builder()
+				.src(argsrc)
+				.logger(new SimpleSourceLogger(null)) // TODO
+				.commands(BasicCommands.all)
+				.build();
 		parser.parse();
 		parser.closeOutput();
 	}

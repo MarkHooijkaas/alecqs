@@ -1,9 +1,7 @@
 package org.kisst.alecqs;
 
-import org.kisst.alecqs.command.BasicCommands;
-import org.kisst.alecqs.command.CommandList;
-import org.kisst.alecqs.logger.Logger;
-import org.kisst.alecqs.logger.ParserLogger;
+import org.kisst.alecqs.command.Command;
+import org.kisst.alecqs.logger.SourceLogger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,30 +15,24 @@ import java.util.Map;
 public class Parser {
 	public final Parser parent;
 	public final LineSource src;
-	public final Logger logger;
+	public final SourceLogger logger;
 
 	private final Map<String,String> vars = new HashMap<String, String>();
 	private final File dir;
-	private final CommandList commands;
+	private final Command commands;
 
 	private File currentOutputFile = null;
 	private PrintStream out = null;
 
-	public Parser(Parser parent, FileSource src) { this(parent, src, src.getDir()); }
-	public Parser(Parser parent, LineSource src, File dir) {
-		this.commands= BasicCommands.all;
-		this.parent=parent;
-		this.dir=dir;
-		this.src=src;
-		this.logger=new ParserLogger(this);
+	private Parser(Builder builder) {
+		this.parent=builder.parent;
+		this.src=builder.src;
+		this.logger=builder.logger;
+		this.commands=builder.commands;
+		this.dir=builder.dir;
 		if (parent==null) {
 			setLocalProp("$", "$");
 			setLocalProp("@", "@");
-		}
-		if (src instanceof FileSource) {
-			FileSource f= (FileSource) src;
-			setLocalProp("FILENAME", f.getFilename());
-			setLocalProp("FILEBASE", f.getFilebase());
 		}
 	}
 
@@ -132,24 +124,24 @@ public class Parser {
 	public String substitute(String str) {
 		if (str==null) return null;
 		StringBuilder result = new StringBuilder();
-		int prevpos=0;
+		int previousPosition=0;
 		int pos=str.indexOf("${");
 		while (pos>=0) {
 			int pos2=str.indexOf("}", pos);
 			if (pos2<0)
 				throw new RuntimeException("Unbounded ${ starting with "+str.substring(pos,pos+10));
 			String key=str.substring(pos+2,pos2);
-			result.append(str.substring(prevpos,pos));
+			result.append(str.substring(previousPosition,pos));
 			String value= getProp(key);
 			if (value==null && key.equals("dollar"))
 				value="$";
 			if (value==null)
 				throw new RuntimeException("Unknown variable ${"+key+"}");
 			result.append(value);
-			prevpos=pos2+1;
-			pos=str.indexOf("${",prevpos);
+			previousPosition=pos2+1;
+			pos=str.indexOf("${",previousPosition);
 		}
-		result.append(str.substring(prevpos));
+		result.append(str.substring(previousPosition));
 		return result.toString();
 	}
 
@@ -166,6 +158,27 @@ public class Parser {
 			setLocalProp(arg.substring(0, pos).trim(), arg.substring(pos+1).trim());
 		else
 			logger.logWarn("ignoring local property definition "+ arg);
+	}
+
+	public static class Builder {
+		private SourceLogger logger;
+		private LineSource src;
+		private Command commands;
+		private Parser parent;
+		private File dir;
+		public Builder() {}
+		public Builder(Parser parent) {
+			this.parent=parent;
+			logger=parent.logger;
+			commands=parent.commands;
+			src=parent.src;
+			dir=parent.dir;
+		}
+		public Parser build() { return new Parser(this);}
+		public Builder logger(SourceLogger logger) { this.logger=logger; return this; }
+		public Builder src(LineSource src) { this.src=src; return this; }
+		public Builder commands(Command commands) { this.commands=commands; return this; }
+		public Builder dir(File dir) { this.dir=dir; return this; }
 	}
 }
  

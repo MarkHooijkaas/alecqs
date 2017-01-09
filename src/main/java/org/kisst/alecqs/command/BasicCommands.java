@@ -13,9 +13,14 @@ public class BasicCommands {
 			File f = new File(parser.getDir(), remainder.trim());
 			parser.logger.logDebug("Loading: " + f);
 			FileSource fs = new FileSource(f);
-			Parser p = new Parser(parser, fs);
+			Parser p = new Parser.Builder(parser)
+					.src(fs)
+					.logger(parser.logger.createChildLogger(fs))
+					.dir(fs.getDir())
+					.build();
+			p.setLocalProp("FILENAME", fs.getFilename());
+			p.setLocalProp("FILEBASE", fs.getFilebase());
 			p.parse();
-
 		}
 	};
 
@@ -56,8 +61,11 @@ public class BasicCommands {
 			String macro=parser.getProp(cmd);
 			if (macro==null)
 				throw new RuntimeException("could not find macro "+cmd);
-			StringSource lines= new StringSource("MACRO "+cmd, macro);
-			Parser p=new Parser(parser, lines, parser.getDir());
+			StringSource src= new StringSource("MACRO "+cmd, macro);
+			Parser p = new Parser.Builder(parser)
+					.src(src)
+					.logger(parser.logger.createChildLogger(src))
+					.build();
 			String[] args=remainder.split("[,]+");
 			for (String arg: args) {
 				arg=arg.trim();
