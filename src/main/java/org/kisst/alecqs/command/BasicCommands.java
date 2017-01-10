@@ -13,7 +13,7 @@ public class BasicCommands {
 
 	public final static Command GLOBAL = new NamedCommand("GLOBAL") {
 		@Override protected void execute(Parser parser, String remainder) {
-			parser.getRoot().parseLine(parser.substitute(remainder));
+			parser.getRoot().parseLine(parser.substitute(remainder.trim()));
 		}
 	};
 
@@ -25,7 +25,7 @@ public class BasicCommands {
 
 	public final static Command VAR = new NamedCommand("VAR") {
 		@Override protected void execute(Parser parser, String remainder) {
-			parser.parseProp(parser.substitute(remainder));
+			parser.parseProp(parser.substitute(remainder.trim()));
 		}
 	};
 
