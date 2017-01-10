@@ -22,7 +22,7 @@ public class RunCommand extends NamedCommand {
 		for (String arg: args) {
 			arg=arg.trim();
 			if (arg.length()>0)
-				p.parseLocalProp(parser.substitute(arg));
+				p.parseProp(parser.substitute(arg));
 		}
 		p.parse();
 

@@ -85,7 +85,7 @@ public class Parser {
 			logger.logTrace("Parsing:"+line);
 		if (line.indexOf('=')>0 && out==null) {
 			line=substitute(line);
-			parseGlobalProp(line.trim());
+			getRoot().parseProp(line.trim());
 		}
 		else
 			outputLine(this, line);
@@ -146,14 +146,7 @@ public class Parser {
 		return result.toString();
 	}
 
-	public void parseGlobalProp(String arg) {
-		int pos= arg.indexOf("=");
-		if (pos>0)
-			getRoot().setLocalProp(arg.substring(0, pos).trim(), arg.substring(pos+1).trim());
-		else
-			logger.logWarn("ignoring global property definition "+ arg);
-	}
-	public void parseLocalProp(String arg) {
+	public void parseProp(String arg) {
 		int pos= arg.indexOf("=");
 		if (pos>0)
 			setLocalProp(arg.substring(0, pos).trim(), arg.substring(pos+1).trim());
