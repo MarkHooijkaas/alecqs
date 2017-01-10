@@ -15,6 +15,6 @@ public class MacroCommand extends NamedCommand {
 			else
 				macro.append(line).append("\n");
 		}
-		parser.getRoot().setLocalProp(name, macro.toString());
+		parser.getRoot().setProp(name, macro.toString());
 	}
 }

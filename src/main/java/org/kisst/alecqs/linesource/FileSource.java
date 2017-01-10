@@ -21,12 +21,9 @@ public class FileSource implements LineSource {
 		}
 		catch (FileNotFoundException e) { throw new RuntimeException(e); }
 	    this.filename=file.getName().trim().replace('\\','/');
-      	//log(INFO, "Parsing "+dir.toString().replace('\\','/')+"/"+filename);
 
 		int pos0=filename.lastIndexOf('.');
       	this.filebase=filename.substring(0,pos0);
-		//setLocalProp("FILENAME", filename);
-		//setLocalProp("FILEBASE", filebase);
 	}
 
 	@Override public String getName() { return filename;}

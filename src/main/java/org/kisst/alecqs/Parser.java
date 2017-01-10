@@ -32,8 +32,8 @@ public class Parser {
 		this.commands=builder.commands;
 		this.dir=builder.dir;
 		if (parent==null) {
-			setLocalProp("$", "$");
-			setLocalProp("@", "@");
+			setProp("$", "$");
+			setProp("@", "@");
 		}
 	}
 
@@ -42,7 +42,7 @@ public class Parser {
 	public File getDir() { return dir; }
 
 
-	public void setLocalProp(String key, String value) {
+	public void setProp(String key, String value) {
 		if (logger.debugEnabled())
 			logger.logDebug("setting local property "+key+"="+value);
 		vars.put(key.trim(), value);
@@ -149,7 +149,7 @@ public class Parser {
 	public void parseProp(String arg) {
 		int pos= arg.indexOf("=");
 		if (pos>0)
-			setLocalProp(arg.substring(0, pos).trim(), arg.substring(pos+1).trim());
+			setProp(arg.substring(0, pos).trim(), arg.substring(pos+1).trim());
 		else
 			logger.logWarn("ignoring local property definition "+ arg);
 	}

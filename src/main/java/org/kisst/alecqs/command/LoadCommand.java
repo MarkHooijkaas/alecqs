@@ -17,8 +17,8 @@ public class LoadCommand extends NamedCommand {
 				.logger(parser.logger.createChildLogger(fs))
 				.dir(fs.getDir())
 				.build();
-		p.setLocalProp("FILENAME", fs.getFilename());
-		p.setLocalProp("FILEBASE", fs.getFilebase());
+		p.setProp("FILENAME", fs.getFilename());
+		p.setProp("FILEBASE", fs.getFilebase());
 		p.parse();
 	}
 }
