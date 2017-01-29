@@ -12,6 +12,7 @@ public class BasicCommands {
 	public final static Command LOAD = new LoadCommand("LOAD");
 	public final static Command MACRO = new MacroCommand("MACRO");
 	public final static Command CALC = new CalcCommand("CALC");
+	public final static Command IF = new IfCommand();
 
 	public final static Command GLOBAL = new NamedCommand("GLOBAL") {
 		@Override protected void execute(Parser parser, LineSource src, String remainder) {
@@ -62,6 +63,7 @@ public class BasicCommands {
 			RUN,
 			MACRO,
 			CALC,
+			IF,
 			VAR,
 			DEFAULT,
 			PARENT,

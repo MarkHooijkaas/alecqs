@@ -8,4 +8,10 @@ NAME=mark
 @CALC GREET="Hello ${ADJ} ${NAME}".toUpperCase()
 
 @OUTPUTFILE calc.out
+@IF "${NAME}"=="mark"
+OK
+@ELSE
+NOT OK
+@ENDIF
+
 ${GREET}
