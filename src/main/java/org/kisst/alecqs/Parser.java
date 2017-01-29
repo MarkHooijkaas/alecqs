@@ -133,11 +133,22 @@ public class Parser {
 				throw new RuntimeException("Unbounded ${ starting with "+str.substring(pos,pos+10));
 			String key=str.substring(pos+2,pos2);
 			result.append(str.substring(previousPosition,pos));
+
+			int elvisPos= key.indexOf("?:");
+			String defaultValue=null;
+			if (elvisPos>0) {
+				defaultValue=key.substring(elvisPos+2);
+				key=key.substring(0,elvisPos);
+			}
 			String value= getProp(key);
-			if (value==null && key.equals("dollar"))
-				value="$";
-			if (value==null)
-				throw new RuntimeException("Unknown variable ${"+key+"}");
+			if (value==null) {
+				if (key.equals("dollar"))
+					value = "$";
+				else if (elvisPos > 0)
+					value = defaultValue;
+				else
+					throw new RuntimeException("Unknown variable ${" + key + "}");
+			}
 			result.append(value);
 			previousPosition=pos2+1;
 			pos=str.indexOf("${",previousPosition);
