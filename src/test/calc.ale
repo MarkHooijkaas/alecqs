@@ -1,7 +1,11 @@
 
-NAME=world
 
-@CALC GREET="Hello ${NAME}".toUpperCase()
+NAME=mark
+
+@DEFAULT NAME=world
+@DEFAULT ADJ=great
+
+@CALC GREET="Hello ${ADJ} ${NAME}".toUpperCase()
 
 @OUTPUTFILE calc.out
 ${GREET}

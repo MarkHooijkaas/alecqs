@@ -30,6 +30,17 @@ public class BasicCommands {
 		}
 	};
 
+	public final static Command DEFAULT = new NamedCommand("DEFAULT") {
+		@Override protected void execute(Parser parser, String remainder) {
+			int pos= remainder.indexOf("=");
+			if (pos<=0)
+				throw new RuntimeException("Syntax error: @DEFAULT <var>=<text>");
+			String key=remainder.substring(0,pos).trim();
+			if (parser.getProp(key)==null)
+				parser.parseProp(parser.substitute(remainder.trim()));
+		}
+	};
+
 	public final static Command LOGLEVEL = new NamedCommand("LOGLEVEL") {
 		@Override protected void execute(Parser parser, String remainder) {
 			parser.logger.setLogLevel(Logger.Level.valueOf(remainder.trim()));
@@ -51,6 +62,7 @@ public class BasicCommands {
 			MACRO,
 			CALC,
 			VAR,
+			DEFAULT,
 			PARENT,
 			OUTPUTFILE,
 			LOGLEVEL
