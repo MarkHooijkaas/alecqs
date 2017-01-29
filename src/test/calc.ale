@@ -1,0 +1,7 @@
+
+NAME=world
+
+@CALC GREET="Hello ${NAME}".toUpperCase()
+
+@OUTPUTFILE calc.out
+${GREET}
