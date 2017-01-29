@@ -1,22 +1,23 @@
 package org.kisst.alecqs.command;
 
 import org.kisst.alecqs.Parser;
+import org.kisst.alecqs.linesource.LineSource;
 
 public abstract class NamedCommand implements Command {
 	private final String name;
 
 	public NamedCommand(String name) { this.name="@"+name;}
 
-	@Override public boolean handle(Parser parser, String line) {
+	@Override public boolean handle(Parser parser, LineSource src, String line) {
 		if (! line.trim().startsWith(name))
 			return false;
 		String remainder=line.substring(name.length());
 		parser.logger.logInfo("Command: "+name+remainder);
-		execute(parser, remainder);
+		execute(parser, src, remainder);
 		return true;
 	}
 
-	protected abstract void execute(Parser parser, String remainder);
+	protected abstract void execute(Parser parser, LineSource src, String remainder);
 	@Override public String toString() { return "Command("+name+")"; }
 
 	public static String getFirstToken(String line) {

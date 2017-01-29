@@ -27,11 +27,10 @@ public class Main {
 		StringSource argsrc = new StringSource("main", args);
 		//Parser parser=new Parser(null, argsrc, dir);
 		Parser parser= new Parser.Builder()
-				.src(argsrc)
 				.logger(new SimpleSourceLogger(argsrc,""))
 				.commands(BasicCommands.all)
 				.build();
-		parser.parse();
+		parser.parse(argsrc);
 		parser.closeOutput();
 	}
 }

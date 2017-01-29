@@ -1,14 +1,14 @@
 package org.kisst.alecqs.command;
 
 import org.kisst.alecqs.Parser;
-
+import org.kisst.alecqs.linesource.LineSource;
 
 
 public class CalcCommand extends NamedCommand {
 	public CalcCommand(String name) { super(name); }
 
 
-	@Override protected void execute(Parser parser, String remainder) {
+	@Override protected void execute(Parser parser, LineSource src, String remainder) {
 		remainder=remainder.trim();
 		int pos=remainder.indexOf('=');
 		if (pos<=0)

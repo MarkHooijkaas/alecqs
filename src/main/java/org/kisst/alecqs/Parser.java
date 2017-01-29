@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class Parser {
 	public final Parser parent;
-	public final LineSource src;
+	//public final LineSource src;
 	public final SourceLogger logger;
 
 	private final Map<String,String> vars = new HashMap<String, String>();
@@ -27,7 +27,7 @@ public class Parser {
 
 	private Parser(Builder builder) {
 		this.parent=builder.parent;
-		this.src=builder.src;
+		//this.src=builder.src;
 		this.logger=builder.logger;
 		this.commands=builder.commands;
 		this.dir=builder.dir;
@@ -37,7 +37,7 @@ public class Parser {
 		}
 	}
 
-	public String readLine() { return src.getLine(); }
+	//public String readLine() { return src.getLine(); }
 	public Parser getParent() { return parent; }
 	public File getDir() { return dir; }
 
@@ -62,12 +62,12 @@ public class Parser {
 	}
 
 
-	public void parse() {
+	public void parse(LineSource src) {
 		boolean done=false;
 		try {
 			String line;
 			while ((line = src.getLine()) != null)
-				parseLine(line);
+				parseLine(src, line);
 			done=true;
 		}
 		finally {
@@ -78,8 +78,8 @@ public class Parser {
 	}
 
 
-	public void parseLine(String line) {
-		if (commands.handle(this,line))
+	public void parseLine(LineSource src, String line) {
+		if (commands.handle(this, src, line))
 			return;
 		if (logger.traceEnabled())
 			logger.logTrace("Parsing:"+line);
@@ -167,7 +167,7 @@ public class Parser {
 
 	public static class Builder {
 		private SourceLogger logger;
-		private LineSource src;
+		//private LineSource src;
 		private Command commands;
 		private Parser parent;
 		private File dir;
@@ -176,12 +176,12 @@ public class Parser {
 			this.parent=parent;
 			logger=parent.logger;
 			commands=parent.commands;
-			src=parent.src;
+			//src=parent.src;
 			dir=parent.dir;
 		}
 		public Parser build() { return new Parser(this);}
 		public Builder logger(SourceLogger logger) { this.logger=logger; return this; }
-		public Builder src(LineSource src) { this.src=src; return this; }
+		//public Builder src(LineSource src) { this.src=src; return this; }
 		public Builder commands(Command commands) { this.commands=commands; return this; }
 		public Builder dir(File dir) { this.dir=dir; return this; }
 	}

@@ -1,6 +1,6 @@
  
 ---------------------------------------------
-@MACRO STD_SCRIPT
+@GLOBAL @MACRO STD_SCRIPT
 @GLOBAL QMGR=${QMGR}
 @PARENT @OUTPUTFILE ${FILEBASE}-${QMGR}-${ENV}.mqsc
 @GLOBAL SYSTEM=${SYSTEM}
@@ -14,17 +14,17 @@
  
 
 ---------------------------------------------
-@MACRO QL
+@GLOBAL @MACRO QL
 def ql(${QNAME}.LQ) replace defpsist(YES)
 @ENDMACRO
  
 ---------------------------------------------
-@MACRO QA
+@GLOBAL @MACRO QA
 def qa(${QNAME}.AQ) replace targq(${QNAME}.LQ) defpsist(YES)
 @ENDMACRO
  
 ---------------------------------------------
-@MACRO QLA
+@GLOBAL @MACRO QLA
 @VAR QNAME=${ENV}.${SYSTEM}.${NAME}
  
 **********************************************
