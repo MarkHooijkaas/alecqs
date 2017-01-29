@@ -10,6 +10,7 @@ public class BasicCommands {
 	public final static Command RUN = new RunCommand("RUN");
 	public final static Command LOAD = new LoadCommand("LOAD");
 	public final static Command MACRO = new MacroCommand("MACRO");
+	public final static Command CALC = new CalcCommand("CALC");
 
 	public final static Command GLOBAL = new NamedCommand("GLOBAL") {
 		@Override protected void execute(Parser parser, String remainder) {
@@ -48,6 +49,7 @@ public class BasicCommands {
 			GLOBAL,
 			RUN,
 			MACRO,
+			CALC,
 			VAR,
 			PARENT,
 			OUTPUTFILE,
