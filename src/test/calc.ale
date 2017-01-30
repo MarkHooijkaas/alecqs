@@ -9,9 +9,15 @@ NAME=mark
 
 @OUTPUTFILE calc.out
 @IF "${NAME}"=="mark"
-OK
+IF works OK
 @ELSE
-NOT OK
+If works NOT OK
+@ENDIF
+
+@IF NAME=="mark"
+Binding works OK
+@ELSE
+Binding works NOT OK
 @ENDIF
 
 ${GREET}
